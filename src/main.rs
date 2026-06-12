@@ -9,7 +9,7 @@ struct Task {
 // TODO: research
 impl fmt::Display for Task {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if let true = self.done {
+        if self.done {
             write!(f, "✅ {}", self.name)
         }  else {
             write!(f, "{}", self.name)
@@ -18,8 +18,8 @@ impl fmt::Display for Task {
 }
 
 impl Task {
-    fn new(name: &str) -> Self {
-        Task{name: name.to_string(), done: false}
+    fn new(name: String) -> Self {
+        Task{name: name, done: false}
     }
 }
 
@@ -51,7 +51,7 @@ impl Command {
             }
         };
 
-        return match cmd {
+        match cmd {
             "add" => Some(Command::Add{ arg: arg.to_string() }),
             "list" => Some(Command::List),
             "help" => Some(Command::Help),
@@ -79,12 +79,12 @@ impl Command {
                 println!("error> unknown command!");
                 None
             }
-        };
+        }
     }
 
     fn execute(self, tasks: &mut Vec<Task>) {
         match self {
-            Command::Add { arg} => tasks.push(Task::new(&arg)),
+            Command::Add { arg} => tasks.push(Task::new(arg)),
             Command::Done { arg } => {
                 let task = match tasks.get_mut(arg) {
                     Some(s) => s,
@@ -138,7 +138,7 @@ fn print_help() {
     ");
 }
 
-fn print_vec(vec: &Vec<Task>) {
+fn print_vec(vec: &[Task]) {
     for (i, item) in vec.iter().enumerate() {
         println!("{i}) {item}");
     }
