@@ -29,6 +29,7 @@ enum Command {
     Done { arg: usize },
     List,
     Help,
+    Exit
 }
 
 impl Command {
@@ -55,6 +56,7 @@ impl Command {
             "add" => Some(Command::Add{ arg: arg.to_string() }),
             "list" => Some(Command::List),
             "help" => Some(Command::Help),
+            "exit" => Some(Command::Exit),
             "remove" => {
                 let arg: usize = match arg.parse() {
                     Ok(i) => i,
@@ -84,6 +86,9 @@ impl Command {
 
     fn execute(self, tasks: &mut Vec<Task>) {
         match self {
+            Command::Help => {print_help()}
+            Command::List => {print_vec(tasks)},
+            Command::Exit => (),
             Command::Add { arg} => tasks.push(Task::new(arg)),
             Command::Done { arg } => {
                 let task = match tasks.get_mut(arg) {
@@ -96,7 +101,6 @@ impl Command {
                 task.done = true;
                 
             },
-            Command::List => {print_vec(tasks)},
             Command::Remove { arg } => {
                 match tasks.get(arg) {
                     Some(_) => tasks.remove(arg),
@@ -107,7 +111,6 @@ impl Command {
                 };
             },
 
-            Command::Help => {print_help()}
         }
     }
 }
@@ -121,6 +124,7 @@ fn main() {
         io::stdout().flush().unwrap();
         let cmd = Command::new_from_input();
         match cmd {
+            Some(Command::Exit) => break,
             Some(command) => command.execute(&mut tasks),
             None => ()   
         }
@@ -129,12 +133,13 @@ fn main() {
 
 fn print_help() {
     println!("
-        Welcome to task manager! It's quite simple yet.\n
-        Available commands are:\n
-        - add <arg> –– add task to list\n
-        - done <num> –– mark task as done\n
-        - remove <num> –– remove task from list\n
-        - help –– for information\n
+        Welcome to task manager! It's quite simple yet.
+        Available commands are:
+        - add <arg> –– add task to list
+        - done <num> –– mark task as done
+        - remove <num> –– remove task from list
+        - help –– for information
+        - exit –– close application
     ");
 }
 
