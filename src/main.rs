@@ -44,18 +44,19 @@ impl Command {
         };
     }
 
-    fn execute(&self, tasks: &mut Vec<String>) {
+    fn execute(self, tasks: &mut Vec<String>) {
         match self {
             Command::Add { args } => {
                 let task = match args.get(0) {
-                    Some(s) => s.to_string(),
+                    Some(s) => s.clone(),
                     None => {
-                        print!("error> Invalid add command args");
+                        println!("error> Invalid add command args");
                         return
                     }
                 };
                 tasks.push(task);
             },
+
             Command::Done { args } => {
                 if let Some(s) = args.get(0) {
                     let index: usize = match s.parse() {
@@ -77,7 +78,9 @@ impl Command {
                     println!("error> empty arguments list");
                 }
             },
+
             Command::List => {print_vec(tasks)},
+
             Command::Remove { args } => {
                 if let Some(s) = args.get(0) {
                     let index: usize = match s.parse() {
@@ -98,6 +101,7 @@ impl Command {
                     println!("error> empty arguments list");
                 }
             },
+
             Command::Help => {print_help()}
         }
     }
