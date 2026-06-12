@@ -1,5 +1,27 @@
-use std::{io, usize};
+use std::{io, usize, fmt};
 use std::io::Write;
+
+struct Task {
+    name: String,
+    done: bool
+}
+
+// TODO: research
+impl fmt::Display for Task {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if self.done {
+            write!(f, "✅ {}", self.name)
+        }  else {
+            write!(f, "{}", self.name)
+        }
+    }
+}
+
+impl Task {
+    fn new(name: String) -> Self {
+        Task{name: name, done: false}
+    }
+}
 
 enum Command {
     Add { arg: String },
@@ -29,7 +51,7 @@ impl Command {
             }
         };
 
-        return match cmd {
+        match cmd {
             "add" => Some(Command::Add{ arg: arg.to_string() }),
             "list" => Some(Command::List),
             "help" => Some(Command::Help),
@@ -57,20 +79,22 @@ impl Command {
                 println!("error> unknown command!");
                 None
             }
-        };
+        }
     }
 
-    fn execute(self, tasks: &mut Vec<String>) {
+    fn execute(self, tasks: &mut Vec<Task>) {
         match self {
-            Command::Add { arg} => tasks.push(arg),
+            Command::Add { arg} => tasks.push(Task::new(arg)),
             Command::Done { arg } => {
-                match tasks.get_mut(arg) {
+                let task = match tasks.get_mut(arg) {
                     Some(s) => s,
                     None => {
                         println!("error> index out of bounds");
                         return
                     }
-                }.insert_str(0, "✅");
+                };
+                task.done = true;
+                
             },
             Command::List => {print_vec(tasks)},
             Command::Remove { arg } => {
@@ -90,7 +114,7 @@ impl Command {
 
 fn main() {
     println!("type `help` for commands list");
-    let mut tasks: Vec<String> = Vec::new();
+    let mut tasks: Vec<Task> = Vec::new();
     
     loop {    
         print!("todo> ");
@@ -103,12 +127,6 @@ fn main() {
     }
 }
 
-fn print_vec(vec: &Vec<String>) {
-    for (i, item) in vec.iter().enumerate() {
-        println!("{i}) {item}");
-    }
-}
-
 fn print_help() {
     println!("
         Welcome to task manager! It's quite simple yet.\n
@@ -118,4 +136,10 @@ fn print_help() {
         - remove <num> –– remove task from list\n
         - help –– for information\n
     ");
+}
+
+fn print_vec(vec: &[Task]) {
+    for (i, item) in vec.iter().enumerate() {
+        println!("{i}) {item}");
+    }
 }
